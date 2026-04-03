@@ -49,23 +49,27 @@ function DemoTransactionForm() {
 
   // Once mockTransactions loads from localStorage, populate form if editing
   const [populated, setPopulated] = useState(false);
+
   useEffect(() => {
     if (!editId || !mockTransactions.length || populated) return;
     const tx = mockTransactions.find((t) => t.id === editId);
     if (!tx) return;
+
+    // Use reset but ensure order of fields
     reset({
+      transactionType: tx.transactionType, // Set this first
+      category: tx.category,              // Then this
       assetName: tx.assetName,
-      transactionType: tx.transactionType,
       totalAmount: tx.totalAmount.toString(),
       description: tx.description || "",
       accountId: MOCK_ACCOUNT_ID,
-      category: tx.category || "other-expense",
       timestamp: new Date(tx.timestamp),
       isRecurring: tx.isRecurring,
       recurringInterval: tx.recurringInterval || undefined,
     });
+
     setPopulated(true);
-  }, [editId, mockTransactions, populated]);
+  }, [editId, mockTransactions, populated, reset]);
 
   // If user is actually signed in, send them to the real form
   useEffect(() => {
@@ -86,9 +90,9 @@ function DemoTransactionForm() {
   const category = watch("category");
   const recurringInterval = watch("recurringInterval");
 
-  const filteredCategories = defaultCategories.filter(
-    (c) => c.type === (transactionType === "INCOME" ? "INCOME" : "EXPENSE")
-  );
+  const filteredCategories = useMemo(() => {
+    return defaultCategories.filter((c) => c.type === transactionType);
+  }, [transactionType]);
 
   const onSubmit = (data) => {
     setSubmitting(true);
@@ -119,15 +123,25 @@ function DemoTransactionForm() {
           <label className="text-sm font-medium">Type</label>
           <Select
             value={transactionType}
-            onValueChange={(v) => { setValue("transactionType", v); trigger("transactionType"); setValue("category", ""); }}
+            onValueChange={(v) => {
+              setValue("transactionType", v);
+              // Auto-fill category with the first relevant one to prevent empty state
+              const firstCat = defaultCategories.find((c) => c.type === v)?.id;
+              setValue("category", firstCat || "");
+              trigger(["transactionType", "category"]);
+            }}
           >
-            <SelectTrigger className="w-[180px]"><SelectValue placeholder="Transaction Type" /></SelectTrigger>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Transaction Type" />
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="INCOME">Income</SelectItem>
               <SelectItem value="EXPENSE">Expense</SelectItem>
             </SelectContent>
           </Select>
-          {errors.transactionType && <p className="text-sm text-red-500">{errors.transactionType.message}</p>}
+          {errors.transactionType && (
+            <p className="text-sm text-red-500">{errors.transactionType.message}</p>
+          )}
         </div>
 
         <div className="space-y-2">
