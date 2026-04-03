@@ -1,0 +1,46 @@
+{
+  "background_color": "#ffffff",
+  "description": "Smart app to manage your personal finances",
+  "dir": "ltr",
+  "display": "standalone",
+  "name": "Finance Manager",
+  "orientation": "any",
+  "scope": "/",
+  "short_name": "Finance Manager",
+  "start_url": "/",
+  "theme_color": "#ffffff",
+  "icons": [
+    {
+      "src": "https://ai-investment-manager.vercel.app/favicon.ico",
+      "type": "image/x-icon",
+      "sizes": "491x491",
+      "isSquare": true,
+      "isPng": false,
+      "isWebp": false,
+      "isJpg": false,
+      "width": 491,
+      "is512x512": false,
+      "is256x256": false,
+      "is192x192": false
+    },
+    {
+      "src": "https://ai-investment-manager.vercel.app/favicon.ico",
+      "type": "image/png",
+      "sizes": "491x491",
+      "isSquare": true,
+      "isPng": true,
+      "isWebp": false,
+      "isJpg": false,
+      "width": 491,
+      "is512x512": false,
+      "is256x256": false,
+      "is192x192": false
+    }
+  ],
+  "lang": "en",
+  "categories": [
+    "business",
+    "finance",
+    "productivity"
+  ]
+}

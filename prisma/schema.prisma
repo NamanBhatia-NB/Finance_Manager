@@ -1,0 +1,135 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+}
+
+model User {
+  id          String     @id @default(uuid())
+  clerkUserId String     @unique // Clerk user ID
+  email       String     @unique
+  name        String
+  imageUrl    String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  accounts     Account[]
+  portfolios   Portfolio[]
+  transactions Transaction[]
+  aiQueries    AIQuery[]
+
+  @@map("users")
+}
+
+model Account {
+  id           String        @id @default(uuid())
+  userId       String
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name         String
+  type         AccountType
+  balance      Decimal       @default(0) // Initial balance while creating an account
+  isDefault    Boolean       @default(false)
+  portfolioId  String?       // Connects an account to a portfolio (optional)
+  portfolio    Portfolio?    @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@index([userId])
+  @@map("accounts")
+}
+
+model Portfolio {
+  id            String      @id @default(uuid())
+  userId        String      @unique
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  totalValue    Decimal     @default(0.0)
+  lastAlertSent DateTime?
+  createdAt     DateTime    @default(now())
+
+  holdings      Holding[]
+  accounts      Account[]   // Multiple accounts can be linked to a portfolio
+
+  @@index([userId])
+  @@map("portfolios")
+}
+
+model Holding {
+  id          String    @id @default(uuid())
+  portfolioId String
+  portfolio   Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+  assetName   String
+  ticker      String
+  quantity    Decimal
+  price       Decimal
+  createdAt   DateTime @default(now())
+
+  @@map("holdings")
+}
+
+model Transaction {
+  id                String             @id @default(uuid())
+  userId            String
+  user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accountId         String             // Which account was used for the transaction
+  account           Account            @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  assetName         String
+  description       String             @default("")
+  category          String             @default("other-expense")
+  transactionType   TransactionType    // "INCOME" or "EXPENSE"
+  status            TransactionStatus  // "PENDING", "COMPLETED", "FAILED"
+  totalAmount       Decimal
+  timestamp         DateTime @default(now())
+  isRecurring       Boolean           @default(false)
+  recurringInterval RecurringInterval? // Only used if isRecurring is true
+  nextRecurringDate DateTime?         // Next date for recurring transaction
+  lastProcessed     DateTime?         // Last time this recurring transaction was processed
+
+  @@index([userId, accountId])
+  @@map("transactions")
+}
+
+model AIQuery {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  query      String
+  response   String
+  createdAt  DateTime @default(now())
+
+  @@map("ai_queries")
+}
+
+enum AccountType {
+  CASH
+  BANK
+  BROKERAGE
+  CRYPTO
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+}
+
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+enum riskProfile {
+  LOW
+  MODERATE
+  HIGH
+}
+
+enum RecurringInterval {
+  DAILY
+  WEEKLY
+  MONTHLY
+  YEARLY
+}
