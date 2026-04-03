@@ -3,7 +3,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { MOCK_TRANSACTIONS, MOCK_ACCOUNTS, MOCK_ACCOUNT_ID } from "@/data/mock-data";
 
 const STORAGE_KEY_TRANSACTIONS = "ai_finance_mock_transactions";
-const STORAGE_KEY_INITIALIZED = "ai_finance_mock_initialized";
+const STORAGE_KEY_INITIALIZED = "ai_finance_mock_initialized_v2";
 
 const MockDataContext = createContext();
 

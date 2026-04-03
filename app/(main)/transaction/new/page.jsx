@@ -36,17 +36,7 @@ function DemoTransactionForm() {
     watch, setValue, getValues, trigger, reset,
   } = useForm({
     resolver: zodResolver(transactionSchema),
-    defaultValues: editData ? {
-      assetName: editData.assetName,
-      transactionType: editData.transactionType,
-      totalAmount: editData.totalAmount.toString(),
-      description: editData.description || "",
-      accountId: MOCK_ACCOUNT_ID,
-      category: editData.category || "other-expense",
-      timestamp: new Date(editData.timestamp),
-      isRecurring: editData.isRecurring,
-      ...(editData.recurringInterval && { recurringInterval: editData.recurringInterval }),
-    } : {
+    defaultValues: {
       transactionType: "EXPENSE",
       totalAmount: "",
       description: "",
@@ -56,6 +46,26 @@ function DemoTransactionForm() {
       isRecurring: false,
     },
   });
+
+  // Once mockTransactions loads from localStorage, populate form if editing
+  const [populated, setPopulated] = useState(false);
+  useEffect(() => {
+    if (!editId || !mockTransactions.length || populated) return;
+    const tx = mockTransactions.find((t) => t.id === editId);
+    if (!tx) return;
+    reset({
+      assetName: tx.assetName,
+      transactionType: tx.transactionType,
+      totalAmount: tx.totalAmount.toString(),
+      description: tx.description || "",
+      accountId: MOCK_ACCOUNT_ID,
+      category: tx.category || "other-expense",
+      timestamp: new Date(tx.timestamp),
+      isRecurring: tx.isRecurring,
+      recurringInterval: tx.recurringInterval || undefined,
+    });
+    setPopulated(true);
+  }, [editId, mockTransactions, populated]);
 
   // If user is actually signed in, send them to the real form
   useEffect(() => {
@@ -73,6 +83,8 @@ function DemoTransactionForm() {
   const transactionType = watch("transactionType");
   const isRecurring = watch("isRecurring");
   const timestamp = watch("timestamp");
+  const category = watch("category");
+  const recurringInterval = watch("recurringInterval");
 
   const filteredCategories = defaultCategories.filter(
     (c) => c.type === (transactionType === "INCOME" ? "INCOME" : "EXPENSE")
@@ -106,8 +118,8 @@ function DemoTransactionForm() {
         <div className="space-y-2">
           <label className="text-sm font-medium">Type</label>
           <Select
+            value={transactionType}
             onValueChange={(v) => { setValue("transactionType", v); trigger("transactionType"); setValue("category", ""); }}
-            defaultValue={transactionType}
           >
             <SelectTrigger className="w-[180px]"><SelectValue placeholder="Transaction Type" /></SelectTrigger>
             <SelectContent>
@@ -121,8 +133,8 @@ function DemoTransactionForm() {
         <div className="space-y-2">
           <label className="text-sm font-medium">Category</label>
           <Select
+            value={category || ""}
             onValueChange={(v) => { setValue("category", v); trigger("category"); }}
-            value={getValues("category")}
           >
             <SelectTrigger><SelectValue placeholder="Select category" /></SelectTrigger>
             <SelectContent>
@@ -184,8 +196,8 @@ function DemoTransactionForm() {
           <div className="space-y-2">
             <label className="text-sm font-medium">Recurring Interval</label>
             <Select
+              value={recurringInterval || ""}
               onValueChange={(v) => { setValue("recurringInterval", v); trigger("recurringInterval"); }}
-              defaultValue={getValues("recurringInterval")}
             >
               <SelectTrigger><SelectValue placeholder="Select interval" /></SelectTrigger>
               <SelectContent>
