@@ -218,7 +218,7 @@ const TransactionTable = ({ transactions, isMock = false }) => {
               <TableHead className="cursor-pointer hover:bg-muted/50 transition-colors" onClick={() => handleSort("totalAmount")}>
                 <div className='flex items-center justify-end'>Amount <SortIcon field="totalAmount" /></div>
               </TableHead>
-              <TableHead className="">Recurring</TableHead>
+              <TableHead className="text-center">Recurring</TableHead>
               {isAdmin && <TableHead className="w-[50px]" />}
             </TableRow>
           </TableHeader>
@@ -251,7 +251,7 @@ const TransactionTable = ({ transactions, isMock = false }) => {
                   <TableCell className='text-right font-medium whitespace-nowrap' style={{ color: transaction.transactionType === "INCOME" ? "green" : "red" }}>
                     {transaction.transactionType === "INCOME" ? "+" : "-"}₹ {Number(transaction.totalAmount).toFixed(2)}
                   </TableCell>
-                  <TableCell className="">
+                  <TableCell className="text-center ">
                     {transaction.isRecurring ? (
                       <TooltipProvider>
                         <Tooltip>
@@ -260,14 +260,14 @@ const TransactionTable = ({ transactions, isMock = false }) => {
                               <RefreshCw className="h-3 w-3" />{RECURRING_INTERVALS[transaction.recurringInterval]}
                             </Badge>
                           </TooltipTrigger>
-                          <TooltipContent>
+                          {/* <TooltipContent>
                             {transaction.nextRecurringDate && (
                               <div className='text-sm'>
                                 <div className='font-medium'>Next Date:</div>
                                 <div>{format(new Date(transaction.nextRecurringDate), "PP")}</div>
                               </div>
                             )}
-                          </TooltipContent>
+                          </TooltipContent> */}
                         </Tooltip>
                       </TooltipProvider>
                     ) : (
@@ -275,20 +275,25 @@ const TransactionTable = ({ transactions, isMock = false }) => {
                     )}
                   </TableCell>
                   {isAdmin && (
-                    <TableCell>
-                      <DropdownMenu>
+                    <TableCell >
+                      {!isMock && (<DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" className="h-8 w-8 p-0"><MoreHorizontal className='h-4 w-4' /></Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
                           <DropdownMenuItem onClick={() => {
-                            if (isMock) router.push(`/transaction/new?edit=${transaction.id}`);
-                            else router.push(`/transaction/create?edit=${transaction.id}`);
+                            // if (isMock) router.push(`/transaction/new?edit=${transaction.id}`);
+                            // else router.push(`/transaction/create?edit=${transaction.id}`);
                           }}>Edit</DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem className="text-destructive" onClick={() => handleSingleDelete(transaction.id)}>Delete</DropdownMenuItem>
                         </DropdownMenuContent>
-                      </DropdownMenu>
+                      </DropdownMenu>)}
+                      {isMock && (
+                        <Button onClick={() => handleSingleDelete(transaction.id)} className="" variant="destructive" size="sm">
+                          <Trash className='h-4 w-4 mr-1' />
+                        </Button>
+                      )}
                     </TableCell>
                   )}
                 </TableRow>

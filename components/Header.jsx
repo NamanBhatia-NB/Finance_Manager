@@ -30,7 +30,7 @@ const Header = () => {
         </Link>
 
         {/* Desktop nav */}
-        <div className='hidden md:flex items-center gap-3'>
+        <div className='hidden lg:flex items-center gap-3'>
           <SignedIn>
             <Link href="/dashboard">
               <Button variant="outline" size="sm">
@@ -116,7 +116,7 @@ const Header = () => {
         </div>
 
         {/* Mobile right side: dark mode + hamburger */}
-        <div className='flex md:hidden items-center gap-2'>
+        <div className='flex lg:hidden items-center gap-2'>
           <Button variant="outline" size="icon" onClick={() => setTheme(theme === "dark" ? "light" : "dark")} aria-label="Toggle dark mode">
             <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
             <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
@@ -139,7 +139,7 @@ const Header = () => {
 
       {/* Mobile dropdown menu */}
       {mobileOpen && (
-        <div className='md:hidden border-t border-border bg-background px-4 py-4 flex flex-col gap-3'>
+        <div className='lg:hidden border-t border-border bg-background px-4 py-4 flex flex-col gap-3'>
           <SignedIn>
             <Link href="/dashboard" onClick={closeMobile}>
               <Button variant="outline" className="w-full justify-start gap-2">
